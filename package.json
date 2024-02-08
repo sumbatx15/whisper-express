@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node ./dist/src/index.js",
     "dev": "nodemon src/index.ts",
-    "build": "npx tsc",
+    "build": "tsc",
+    "tsc": "tsc",
+    "postinstall": "npm run tsc",
     "vercel-build": "echo deployed",
     "lint": "eslint --fix src test",
     "test": "jest",
