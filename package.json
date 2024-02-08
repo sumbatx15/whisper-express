@@ -3,6 +3,9 @@
   "version": "1.2.0",
   "description": "A basic starter for an express.js API with Typescript",
   "main": "src/index.ts",
+  "engines": {
+    "node": "18.17.0"
+  },
   "scripts": {
     "start": "node ./dist/src/index.js",
     "dev": "nodemon src/index.ts",
