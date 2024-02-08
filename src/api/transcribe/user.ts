@@ -36,19 +36,7 @@ router.post(
     const whisperTokens = calcWhisperTokens(blob);
     const audio_duration = getDuration(blob);
 
-    const speech = await transcribeAxios(
-      body.buffer,
-      body.lang,
-      `Oliver, sensing Samantha's disappointment, nudged her gently with his wet nose. He looked up at her with his big, soulful eyes, as if to say, "Don't give up, Samantha. There's still more to discover."
-
-      Her father, Mr. Williams, happened to be tinkering with a broken radio in the basement when Samantha and Oliver returned home. He noticed the dejected look on Samantha's face and put his work aside.
-      
-      "Well, Samantha," he said gently, a warm smile spreading across his face, "sometimes the real treasure isn't what you expect it to be. Let's see where this key leads us."
-      
-      Samantha's eyes lit up with renewed hope. She nodded eagerly, her disappointment fading away. With Oliver by her side, she knew that their adventure had only just begun.
-      
-      Little did Samantha know, this key held secrets that would unlock a world beyond her wildest imagination—a world filled with magic, wonder, and a treasure far greater than any material wealth.`
-    );
+    const speech = await transcribeAxios(body.buffer, body.lang);
 
     if (body.mode) {
       const response = await correctWithGPTPrompt(speech.text, body.mode);
