@@ -1,5 +1,7 @@
 import type { FileLike } from "openai/uploads";
 import { openai } from "../app";
+import FormData from "form-data";
+import axios from "axios";
 
 export const createInstructions = (instructions: string) => {
   return `Instruction: "${instructions}"
@@ -20,6 +22,42 @@ type ModeOptions = {
 export type TranscribeOptions = {
   lang?: string;
   mode?: ModeOptions;
+};
+
+export const transcribeAxios = async (
+  file: any,
+  lang = "en",
+  prompt?: string
+) => {
+  const audioBuffer = Buffer.from(file);
+
+  const formData = new FormData();
+  formData.append("file", audioBuffer, "audio.webm");
+  formData.append("model", "whisper-1");
+  formData.append("language", lang);
+
+  console.log("prompt:", prompt);
+  if (prompt) {
+    formData.append("prompt", prompt);
+  }
+
+  // Make the axios request
+  try {
+    const response = await axios.post(
+      "https://api.openai.com/v1/audio/transcriptions",
+      formData,
+      {
+        headers: {
+          ...formData.getHeaders(),
+          Authorization: `Bearer ${process.env.OPEN_AI_API_KEY}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.log("error:", error);
+    throw error;
+  }
 };
 
 export const transcribe = async (

@@ -17,7 +17,7 @@ export type TranscribeOptions = {
 export type TranscribeRequest = Request<
   {},
   {},
-  { buffer: number[] } & TranscribeOptions
+  { buffer: number[]; prompt?: string } & TranscribeOptions
 >;
 
 export const transcriptionBodySchema = z.object({

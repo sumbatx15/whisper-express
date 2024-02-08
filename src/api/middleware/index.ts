@@ -14,7 +14,7 @@ import { normalArrayToBlob } from "../../utils/audio";
 import { bearer } from "../../utils/request";
 import { getCachedSessionUser } from "../../utils/session";
 
-export const authAnonymous = async (
+export const identifyAndCacheAnonymous = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -37,12 +37,19 @@ export const authAnonymous = async (
   }
 };
 
-export const authUser = async (
+export const identifyAndCacheUser = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   const access_token = bearer(req);
+  if (access_token.length <= 32) {
+    return res.status(401).send({
+      errorCode: Errors.NoAccessToken,
+      message: "Invalid access token",
+    });
+  }
+
   if (sessionCache.get(access_token)) return next();
 
   try {
