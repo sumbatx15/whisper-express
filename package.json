@@ -6,7 +6,6 @@
   "scripts": {
     "start": "node ./dist/src/index.js",
     "dev": "nodemon src/index.ts",
-    "tsc": "./node_modules/typescript/bin/tsc",
     "build": "tsc",
     "vercel-build": "echo deployed",
     "lint": "eslint --fix src test",
