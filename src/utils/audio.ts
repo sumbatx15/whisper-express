@@ -26,7 +26,7 @@ export type TranscribeOptions = {
 
 export const transcribeAxios = async (
   file: any,
-  lang = "en",
+  lang?: string,
   prompt?: string
 ) => {
   const audioBuffer = Buffer.from(file);
