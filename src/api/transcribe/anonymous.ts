@@ -38,7 +38,9 @@ router.post(
     const whisperTokens = calcWhisperTokens(blob);
     const audio_duration = getDuration(blob);
 
+    const time = Date.now();
     const speech = await transcribeAxios(body.buffer, body.lang);
+    const time2 = Date.now() - time;
 
     if (body.mode) {
       const response = await correctWithGPTPrompt(speech.text, body.mode);
@@ -93,6 +95,7 @@ router.post(
         text: speech.text,
         timing: {
           audio_duration,
+          transcribe: time2,
         },
       });
     }
