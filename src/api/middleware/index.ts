@@ -20,7 +20,10 @@ export const identifyAndCacheAnonymous = async (
   next: NextFunction
 ) => {
   const fingerprint = bearer(req);
-  if (sessionCache.get(fingerprint)) return next();
+  if (sessionCache.get(fingerprint)) {
+    console.log("cached hit for", fingerprint);
+    return next();
+  }
 
   try {
     const user =
@@ -68,6 +71,7 @@ export const identifyAndCacheUser = async (
 };
 
 export const hasBearer = (req: Request, res: Response, next: NextFunction) => {
+  console.time("start -> request");
   try {
     bearer(req);
     next();

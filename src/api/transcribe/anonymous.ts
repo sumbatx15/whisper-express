@@ -30,6 +30,7 @@ router.use(hasBearer, hasValidBody, identifyAndCacheAnonymous, hasEnoughTokens);
 router.post(
   "/",
   catchAsync(async (req: TranscribeRequest, res: Response) => {
+    console.timeEnd("start -> request");
     const fingerprint = bearer(req);
     const cachedUser = getCachedSessionUser(req)!;
     const { body } = req;
