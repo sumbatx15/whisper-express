@@ -30,18 +30,14 @@ export const transcribeAxios = async (
   prompt?: string
 ) => {
   const audioBuffer = Buffer.from(file);
-
   const formData = new FormData();
+
   formData.append("file", audioBuffer, "audio.webm");
   formData.append("model", "whisper-1");
-  formData.append("language", lang);
 
-  console.log("prompt:", prompt);
-  if (prompt) {
-    formData.append("prompt", prompt);
-  }
+  if (lang) formData.append("language", lang);
+  if (prompt) formData.append("prompt", prompt);
 
-  // Make the axios request
   try {
     const response = await axios.post(
       "https://api.openai.com/v1/audio/transcriptions",
