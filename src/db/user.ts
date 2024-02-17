@@ -104,6 +104,24 @@ export const getUserByUUID = async (uuid: string) => {
   return User.findOne({ uuid });
 };
 
+export const fingUserByUUIDOrGoogleID = async (
+  uuid: string,
+  google_account_id: string
+) => {
+  return User.findOne({ $or: [{ uuid }, { google_account_id }] });
+};
+
+export const mergeUsage = (uuid: string, google_account_id: string) => {
+  return Usage.updateOne(
+    { uuid },
+    {
+      $set: {
+        google_account_id,
+      },
+    }
+  );
+};
+
 export const convertAnonymousToGoogleUser = async (
   uuid: string,
   google_account_id: string,

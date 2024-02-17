@@ -1,4 +1,4 @@
-import { IMode } from "./types";
+import { IMode } from "../db/modes";
 
 export const GPT_MODELS = ["gpt-4-1106-preview", "gpt-3.5-turbo-1106"] as const;
 export const defaultModes: IMode[] = [

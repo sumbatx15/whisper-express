@@ -8,23 +8,24 @@ import { updateUsage } from "../../db/usage";
 import { decreaseTokens } from "../../db/user";
 import { GPT_MODELS } from "../../shared/consts";
 import { TranscribeRequest } from "../../shared/types";
-import {
-  correctWithGPTPrompt,
-  normalArrayToBlob,
-  transcribeAxios,
-} from "../../utils/audio";
+import { correctWithGPTPrompt, transcribeAxios } from "../../utils/audio";
 import catchAsync from "../../utils/catchAsync";
 import { getCachedSessionUser } from "../../utils/session";
 import {
   hasBearer,
   hasEnoughTokens,
-  hasValidBody,
   identifyAndCacheUser,
+  validTranscriptionBody,
 } from "../middleware";
 
 const router = express.Router();
 
-router.use(hasBearer, identifyAndCacheUser, hasValidBody, hasEnoughTokens);
+router.use(
+  hasBearer,
+  identifyAndCacheUser,
+  validTranscriptionBody,
+  hasEnoughTokens
+);
 
 router.post(
   "/",
@@ -32,11 +33,14 @@ router.post(
     const cachedUser = getCachedSessionUser(req)!;
     const { body } = req;
 
-    const blob = normalArrayToBlob(body.buffer || []);
+    const blob = req.context.blob!;
     const whisperTokens = calcWhisperTokens(blob);
     const audio_duration = getDuration(blob);
 
+    const time = Date.now();
     const speech = await transcribeAxios(body.buffer, body.lang);
+    const timeEnd = Date.now() - time;
+    console.log("transcribeAxios:", timeEnd);
 
     if (body.mode) {
       const response = await correctWithGPTPrompt(speech.text, body.mode);

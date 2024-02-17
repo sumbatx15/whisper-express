@@ -1,5 +1,4 @@
 import { Request } from "express";
-import { GPT_MODELS } from "./consts";
 import { z } from "zod";
 
 export type ModeOptions = {
@@ -32,19 +31,6 @@ export const transcriptionBodySchema = z.object({
     })
     .optional(),
 });
-
-export type IMode = {
-  name: string;
-  instructions: string;
-  description?: string;
-  hidden?: boolean;
-  icon: {
-    name: string;
-    color: string;
-    pack: "sax" | "feather";
-  };
-  model: (typeof GPT_MODELS)[number];
-};
 
 export type GoogleTokenInfo = {
   azp: string;

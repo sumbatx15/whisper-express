@@ -1,23 +1,19 @@
 import express, { Request, Response } from "express";
-import { IMode, updateMode } from "../../../db/modes";
-import catchAsync from "../../../utils/catchAsync";
+import { getModes } from "../../../db/modes";
 import { getCachedSessionUser } from "../../../utils/session";
 import { hasBearer, identifyAndCacheUser } from "../../middleware";
+import catchAsync from "../../../utils/catchAsync";
 
 const router = express.Router();
 router.use(hasBearer, identifyAndCacheUser);
 
-type UdapteModeRequest = Request<{}, {}, { id: string; mode: IMode }>;
-
-router.post(
+router.get(
   "/",
-  catchAsync(async (req: UdapteModeRequest, res: Response) => {
+  catchAsync(async (req: Request, res: Response) => {
     const user = getCachedSessionUser(req);
     if (!user) return res.status(401).send({ message: "User not found" });
 
-    return res.send(
-      await updateMode(user.google_account_id, req.body.id, req.body.mode)
-    );
+    return res.send(await getModes(user.google_account_id));
   })
 );
 
