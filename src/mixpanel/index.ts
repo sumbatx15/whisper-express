@@ -6,6 +6,9 @@ export const Mixpanel = {
   "Signed in": (email: string, fingerprint: string) => {
     mixpanel.track("Signed in", { email, distinct_id: fingerprint });
   },
+  "User created": (email: string, fingerprint: string) => {
+    mixpanel.track("User created", { email, distinct_id: fingerprint });
+  },
   "Anonymous created": (fingerprint: string) => {
     mixpanel.track("Anonymous created", {
       distinct_id: fingerprint,

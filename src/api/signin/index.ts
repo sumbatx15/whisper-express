@@ -17,9 +17,9 @@ router.post(
 
       if (!user) {
         await createNewUser(tokenInfo);
+        Mixpanel["User created"](tokenInfo.email, req.body.fingerprint);
       }
 
-      Mixpanel["Signed in"](tokenInfo.email, req.body.fingerprint);
       res.send("ok");
     }
   )
