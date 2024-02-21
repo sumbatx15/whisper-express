@@ -1,8 +1,8 @@
-/* eslint-disable sonarjs/no-duplicate-string */
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 type IUsage = {
   text: string;
+  modeOutput?: string;
   mode?: {
     id?: string;
     model: string;
@@ -27,6 +27,7 @@ const usageSchema = new mongoose.Schema<IUsageModel>({
   usage: [
     {
       text: String,
+      modeOutput: String,
       mode: {
         id: String,
         model: String,
@@ -43,7 +44,7 @@ const usageSchema = new mongoose.Schema<IUsageModel>({
 
 export const Usage = (mongoose.models.Usage ||
   mongoose.model<IUsageModel>(
-    'Usage',
+    "Usage",
     usageSchema
   )) as mongoose.Model<IUsageModel>;
 

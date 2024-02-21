@@ -79,6 +79,7 @@ router.post(
         speech: speech.text,
         timing: {
           audio_duration,
+          transcribe: timeEnd,
         },
       });
     } else {

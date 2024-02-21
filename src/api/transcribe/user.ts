@@ -40,7 +40,6 @@ router.post(
     const time = Date.now();
     const speech = await transcribeAxios(body.buffer, body.lang);
     const timeEnd = Date.now() - time;
-    console.log("transcribeAxios:", timeEnd);
 
     if (body.mode) {
       const response = await correctWithGPTPrompt(speech.text, body.mode);
@@ -59,6 +58,7 @@ router.post(
         usage: {
           tokens_used: usedTokens,
           text: speech.text,
+          modeOutput: response.choices[0].message.content ?? undefined,
           mode: {
             id: body.mode.id,
             name: body.mode.name,
@@ -76,6 +76,7 @@ router.post(
         speech: speech.text,
         timing: {
           audio_duration,
+          transcribe: timeEnd,
         },
       });
     } else {
@@ -95,6 +96,7 @@ router.post(
         text: speech.text,
         timing: {
           audio_duration,
+          transcribe: timeEnd,
         },
       });
     }
