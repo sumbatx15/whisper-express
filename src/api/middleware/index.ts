@@ -41,7 +41,6 @@ export const validFingerprint = async (
   next: NextFunction
 ) => {
   const auth = bearer(req);
-  console.log("anonymous auth:", auth);
   if (auth.length < 64) {
     return res.status(401).send({
       errorCode: Errors.NoAccessToken,

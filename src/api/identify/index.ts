@@ -15,7 +15,6 @@ router.get(
   validFingerprint,
   identifyAndCacheAnonymous,
   async (req: Request, res: Response) => {
-    console.log("req.context:", req.context);
     res.send({
       ttl: sessionCache.getTtl(bearer(req)),
     });

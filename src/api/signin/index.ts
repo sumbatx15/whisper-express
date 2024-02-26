@@ -10,7 +10,6 @@ router.post(
   "/",
   hasBearer,
   validGoogleToken,
-
   catchAsync(
     async (req: Request<{}, {}, { fingerprint: string }>, res: Response) => {
       const tokenInfo = req.context.tokenInfo!;
