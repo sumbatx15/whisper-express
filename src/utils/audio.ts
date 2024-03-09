@@ -51,7 +51,10 @@ export const transcribeAxios = async (
     );
     return response.data;
   } catch (error) {
-    console.log("error:", error);
+    // console.log("error:", error);+
+    // @ts-expect-error ts-migrate(2532) FIXME: Object is possibly 'undefined'.
+    console.log("error.response.data:", error.response.data);
+
     throw error;
   }
 };

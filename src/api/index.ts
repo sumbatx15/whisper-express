@@ -2,6 +2,7 @@ import express, { Response } from "express";
 import transcribeAnonymous from "./transcribe/anonymous";
 import transcribeUser from "./transcribe/user";
 import identifyAndCache from "./identify";
+import feedback from "./feedback";
 import getUser from "./user";
 import signin from "./signin";
 import uninstall from "./uninstall";
@@ -25,6 +26,7 @@ router.use("/u", getUser);
 router.use("/ca", createAnonymous);
 
 router.use("/identify", identifyAndCache);
+router.use("/feedback", feedback);
 
 router.use("/transcribe/u", transcribeUser);
 router.use("/transcribe/a", transcribeAnonymous);

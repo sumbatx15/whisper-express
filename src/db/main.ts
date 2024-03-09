@@ -18,6 +18,7 @@ export const connectToDataBase = async () => {
 };
 
 export interface IFeedback {
+  uuid: string;
   google_account_id: string;
   rating: number;
   message: string;
@@ -39,6 +40,7 @@ const Auth = (mongoose.models.Auth ||
   mongoose.model<IAuth>("Auth", authSchema)) as mongoose.Model<IAuth>;
 
 const feedbackSchema = new mongoose.Schema<IFeedback>({
+  uuid: String,
   google_account_id: String,
   rating: Number,
   message: String,
@@ -98,13 +100,22 @@ export const getAccountInfoByOTT = async (token: string) => {
   };
 };
 
-export const addFeedback = async (
+export const addUserFeedback = async (
   google_account_id: string,
-  feedback: Omit<IFeedback, "google_account_id">
+  feedback: Pick<IFeedback, "rating" | "message">
 ) => {
-  await connectToDataBase();
   return Feedback.create({
     google_account_id,
+    ...feedback,
+  });
+};
+
+export const addAnonymousFeedback = async (
+  uuid: string,
+  feedback: Pick<IFeedback, "rating" | "message">
+) => {
+  return Feedback.create({
+    uuid,
     ...feedback,
   });
 };
