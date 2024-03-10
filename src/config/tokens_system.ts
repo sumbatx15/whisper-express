@@ -19,12 +19,12 @@ const PRICES = {
 };
 
 export const FREE_TOKENS = {
-  tokens: (3 * PRICES.whisper.minute) / ONE_TOKEN,
+  tokens: (20 * PRICES.whisper.minute) / ONE_TOKEN,
   plan_tokens: (60 * PRICES.whisper.minute) / ONE_TOKEN,
 };
 
 export const NEW_USER_TOKENS = {
-  tokens: (20 * PRICES.whisper.minute) / ONE_TOKEN,
+  tokens: (40 * PRICES.whisper.minute) / ONE_TOKEN,
   plan_tokens: (60 * PRICES.whisper.minute) / ONE_TOKEN,
 };
 
