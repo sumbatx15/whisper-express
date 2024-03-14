@@ -14,9 +14,20 @@ export const Mixpanel = {
       distinct_id: fingerprint,
     });
   },
-  uninstall: (fingerprint: string | null) => {
+  uninstall: (
+    fingerprint?: string,
+    google_account_id?: string,
+    version?: string
+  ) => {
+    if (google_account_id) {
+      return mixpanel.track("Uninstall", {
+        distinct_id: google_account_id,
+        ext_version: version,
+      });
+    }
     mixpanel.track("Uninstall", {
-      ...(fingerprint && { distinct_id: fingerprint }),
+      ...(fingerprint && { distinct_id: `$device:${fingerprint}` }),
+      ext_version: version,
     });
   },
 };
