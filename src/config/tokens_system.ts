@@ -28,13 +28,15 @@ export const NEW_USER_TOKENS = {
   plan_tokens: (60 * PRICES.whisper.minute) / ONE_TOKEN,
 };
 
-export const getDuration = (blob: Blob) => {
+export const getDurationFromBlob = (blob: Blob) => {
   return Math.ceil(blob.size / 1024 / 8);
 };
+export const getDurationFromBuffer = (buffer: Buffer) => {
+  return Math.ceil(buffer.length / 1024 / 8);
+};
 
-export const calcWhisperTokens = (blob: Blob) => {
-  const duration = getDuration(blob);
-  return (duration * PRICES.whisper.second) / ONE_TOKEN;
+export const calcWhisperTokens = (durationSeconds: number) => {
+  return (durationSeconds * PRICES.whisper.second) / ONE_TOKEN;
 };
 
 export const calcGPTTokens = (

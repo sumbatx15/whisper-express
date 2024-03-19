@@ -1,4 +1,4 @@
-import express, { Response } from "express";
+import express from "express";
 import transcribeAnonymous from "./transcribe/anonymous";
 import transcribeUser from "./transcribe/user";
 import identifyAndCache from "./identify";
@@ -12,6 +12,8 @@ import getModes from "./modes/get";
 import createMode from "./modes/create";
 import deleteMode from "./modes/delete";
 import updateMode from "./modes/update";
+
+import transcribeBlob from "./transcribeBlob";
 
 const router = express.Router();
 
@@ -36,5 +38,7 @@ router.use("/modes/create", createMode);
 router.use("/modes/delete", deleteMode);
 router.use("/modes/update", updateMode);
 router.use("/uninstall", uninstall);
+
+router.use("/v2/", transcribeBlob);
 
 export default router;

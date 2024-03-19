@@ -2,67 +2,78 @@ import express, { Response } from "express";
 import {
   calcGPTTokens,
   calcWhisperTokens,
-  getDurationFromBlob,
+  getDurationFromBuffer,
 } from "../../config/tokens_system";
-import { updateUsage } from "../../db/usage";
-import { decreaseTokens } from "../../db/user";
+import { updateUsageByUUID } from "../../db/usage";
+import { decreaseTokensByUUID } from "../../db/user";
 import { GPT_MODELS } from "../../shared/consts";
-import { TranscribeRequest } from "../../shared/types";
+import { upload } from "../../shared/multer";
+import { TranscribeRequestV2 } from "../../shared/types";
 import { correctWithGPTPrompt, transcribeAxios } from "../../utils/audio";
 import catchAsync from "../../utils/catchAsync";
 import { getCachedSessionUser } from "../../utils/session";
 import {
   hasBearer,
-  hasEnoughTokens,
-  identifyAndCacheUser,
-  validTranscriptionBody,
+  hasEnoughTokensV2,
+  identifyAndCacheAnonymous,
+  validFingerprint,
+  validTranscriptionBlobBody,
 } from "../middleware";
 
 const router = express.Router();
 
 router.use(
   hasBearer,
-  identifyAndCacheUser,
-  validTranscriptionBody,
-  hasEnoughTokens
+  validFingerprint,
+  identifyAndCacheAnonymous,
+  validTranscriptionBlobBody,
+  upload.single("blob"),
+  hasEnoughTokensV2
 );
 
 router.post(
   "/",
-  catchAsync(async (req: TranscribeRequest, res: Response) => {
+  catchAsync(async (req: TranscribeRequestV2, res: Response) => {
+    if (!req.file?.buffer) {
+      throw new Error("No file buffer");
+    }
+
+    const fingerprint = req.context.fingerprint!;
     const cachedUser = getCachedSessionUser(req)!;
     const { body } = req;
 
-    const blob = req.context.blob!;
-    const audio_duration = getDurationFromBlob(blob);
+    const audio_duration = getDurationFromBuffer(req.file.buffer);
     const whisperTokens = calcWhisperTokens(audio_duration);
 
     const time = Date.now();
-    const speech = await transcribeAxios(body.buffer, body.lang);
+    const speech = await transcribeAxios(req.file.buffer, body.lang);
     const timeEnd = Date.now() - time;
 
-    if (body.mode) {
-      const response = await correctWithGPTPrompt(speech.text, body.mode);
+    if (body.instructions && body.model) {
+      const response = await correctWithGPTPrompt(speech.text, {
+        instructions: body.instructions,
+        model: body.model,
+        name: body.name || "",
+      });
+
       const gptTokens = calcGPTTokens(
-        body.mode.model as (typeof GPT_MODELS)[number],
+        body.model as (typeof GPT_MODELS)[number],
         response.usage!
       );
 
       const usedTokens = whisperTokens + gptTokens;
 
-      decreaseTokens(cachedUser.google_account_id, usedTokens);
+      decreaseTokensByUUID(fingerprint, usedTokens);
       cachedUser.tokens -= usedTokens;
 
-      updateUsage({
-        google_account_id: cachedUser.google_account_id,
+      updateUsageByUUID({
+        uuid: fingerprint,
         usage: {
           tokens_used: usedTokens,
           text: speech.text,
-          modeOutput: response.choices[0].message.content ?? undefined,
           mode: {
-            id: body.mode.id,
-            name: body.mode.name,
-            model: body.mode.model,
+            name: body.name || "",
+            model: body.model,
             input_tokens: response.usage?.prompt_tokens,
             output_tokens: response.usage?.completion_tokens,
           },
@@ -80,8 +91,8 @@ router.post(
         },
       });
     } else {
-      updateUsage({
-        google_account_id: cachedUser.google_account_id,
+      updateUsageByUUID({
+        uuid: fingerprint,
         usage: {
           tokens_used: whisperTokens,
           text: speech.text,
@@ -89,7 +100,7 @@ router.post(
           created_at: Date.now(),
         },
       });
-      decreaseTokens(cachedUser.google_account_id, whisperTokens);
+      decreaseTokensByUUID(fingerprint, whisperTokens);
       cachedUser.tokens -= whisperTokens;
 
       res.status(200).send({

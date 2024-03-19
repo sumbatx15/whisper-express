@@ -2,7 +2,7 @@ import express, { Response } from "express";
 import {
   calcGPTTokens,
   calcWhisperTokens,
-  getDuration,
+  getDurationFromBlob,
 } from "../../config/tokens_system";
 import { updateUsageByUUID } from "../../db/usage";
 import { decreaseTokensByUUID } from "../../db/user";
@@ -37,13 +37,12 @@ router.post(
     const { body } = req;
 
     const blob = req.context.blob!;
-    const whisperTokens = calcWhisperTokens(blob);
-    const audio_duration = getDuration(blob);
+    const audio_duration = getDurationFromBlob(blob);
+    const whisperTokens = calcWhisperTokens(audio_duration);
 
     const time = Date.now();
     const speech = await transcribeAxios(body.buffer, body.lang);
     const timeEnd = Date.now() - time;
-    console.log("transcribeAxios:", timeEnd);
 
     if (body.mode) {
       const response = await correctWithGPTPrompt(speech.text, body.mode);

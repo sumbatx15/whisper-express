@@ -1,6 +1,5 @@
 import { Request } from "express";
 import { z } from "zod";
-
 export type ModeOptions = {
   id?: string;
   name: string;
@@ -19,6 +18,12 @@ export type TranscribeRequest = Request<
   { buffer: number[]; prompt?: string } & TranscribeOptions
 >;
 
+export type TranscribeRequestV2 = Request<
+  {},
+  {},
+  { blob: Blob; prompt?: string; lang?: string } & Partial<ModeOptions>
+>;
+
 export const transcriptionBodySchema = z.object({
   buffer: z.array(z.number()),
   lang: z.string().optional(),
@@ -30,6 +35,13 @@ export const transcriptionBodySchema = z.object({
       model: z.string(),
     })
     .optional(),
+});
+export const transcriptionBodyBlobSchema = z.object({
+  blob: z.any(),
+  lang: z.string().optional(),
+  mode: z.string().optional(),
+  instructions: z.string().optional(),
+  model: z.string().optional(),
 });
 
 export type GoogleTokenInfo = {

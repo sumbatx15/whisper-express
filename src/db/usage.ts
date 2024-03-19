@@ -3,6 +3,8 @@ import mongoose from "mongoose";
 type IUsage = {
   text: string;
   modeOutput?: string;
+  audio?: number[];
+  langCode?: string;
   mode?: {
     id?: string;
     model: string;
@@ -28,6 +30,8 @@ const usageSchema = new mongoose.Schema<IUsageModel>({
     {
       text: String,
       modeOutput: String,
+      audio: [Number],
+      langCode: String,
       mode: {
         id: String,
         model: String,

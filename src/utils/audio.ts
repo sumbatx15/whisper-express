@@ -58,6 +58,39 @@ export const transcribeAxios = async (
     throw error;
   }
 };
+export const transcribeAxiosBlob = async (
+  buffer: Buffer,
+  lang?: string,
+  prompt?: string
+) => {
+  const formData = new FormData();
+
+  formData.append("file", buffer, "audio.webm");
+  formData.append("model", "whisper-1");
+
+  if (lang) formData.append("language", lang);
+  if (prompt) formData.append("prompt", prompt);
+
+  try {
+    const response = await axios.post(
+      "https://api.openai.com/v1/audio/transcriptions",
+      formData,
+      {
+        headers: {
+          ...formData.getHeaders(),
+          Authorization: `Bearer ${process.env.OPEN_AI_API_KEY}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    // console.log("error:", error);+
+    // @ts-expect-error ts-migrate(2532) FIXME: Object is possibly 'undefined'.
+    console.log("error.response.data:", error.response.data);
+
+    throw error;
+  }
+};
 
 export const transcribe = async (
   file: FileLike,

@@ -1,9 +1,17 @@
 import { NextFunction, Request, Response } from "express";
-import { calcWhisperTokens } from "../../config/tokens_system";
+import {
+  calcWhisperTokens,
+  getDurationFromBlob,
+  getDurationFromBuffer,
+} from "../../config/tokens_system";
 import { createAnonymousUser, getUser, getUserByUUID } from "../../db/user";
 import { getGoogleTokenInfo } from "../../service/service";
 import { Errors } from "../../shared/consts";
-import { TranscribeRequest, transcriptionBodySchema } from "../../shared/types";
+import {
+  TranscribeRequest,
+  transcriptionBodyBlobSchema,
+  transcriptionBodySchema,
+} from "../../shared/types";
 import { normalArrayToBlob } from "../../utils/audio";
 import { bearer } from "../../utils/request";
 import {
@@ -160,6 +168,21 @@ export const validTranscriptionBody = async (
     });
   }
 };
+export const validTranscriptionBlobBody = async (
+  req: TranscribeRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    transcriptionBodyBlobSchema.parse(req.body);
+    next();
+  } catch (error) {
+    res.status(400).send({
+      message: "Invalid body",
+      error,
+    });
+  }
+};
 
 export const hasEnoughTokens = async (
   req: TranscribeRequest,
@@ -168,10 +191,30 @@ export const hasEnoughTokens = async (
 ) => {
   const cachedUser = getCachedSessionUser(req);
   const blob = await normalArrayToBlob(req.body.buffer);
-  const tokens = calcWhisperTokens(blob);
+  const audio_duration = getDurationFromBlob(blob);
+  const tokens = calcWhisperTokens(audio_duration); 
 
   if ((cachedUser?.tokens || 0) > tokens) {
     req.context.blob = blob;
+    next();
+  } else {
+    res.status(402).send({
+      errorCode: Errors.NotEnoughTokens,
+      message: "Not enough tokens",
+    });
+  }
+};
+
+export const hasEnoughTokensV2 = async (
+  req: TranscribeRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  const cachedUser = getCachedSessionUser(req);
+  const audio_duration = getDurationFromBuffer(req.file?.buffer!);
+  const tokens = calcWhisperTokens(audio_duration);
+
+  if ((cachedUser?.tokens || 0) > tokens) {
     next();
   } else {
     res.status(402).send({
