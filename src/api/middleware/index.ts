@@ -192,7 +192,7 @@ export const hasEnoughTokens = async (
   const cachedUser = getCachedSessionUser(req);
   const blob = await normalArrayToBlob(req.body.buffer);
   const audio_duration = getDurationFromBlob(blob);
-  const tokens = calcWhisperTokens(audio_duration); 
+  const tokens = calcWhisperTokens(audio_duration);
 
   if ((cachedUser?.tokens || 0) > tokens) {
     req.context.blob = blob;
@@ -200,7 +200,7 @@ export const hasEnoughTokens = async (
   } else {
     res.status(402).send({
       errorCode: Errors.NotEnoughTokens,
-      message: "Not enough tokens",
+      message: "Not enough credits",
     });
   }
 };
@@ -219,7 +219,7 @@ export const hasEnoughTokensV2 = async (
   } else {
     res.status(402).send({
       errorCode: Errors.NotEnoughTokens,
-      message: "Not enough tokens",
+      message: "Not enough credits",
     });
   }
 };

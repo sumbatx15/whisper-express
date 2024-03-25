@@ -27,6 +27,15 @@ app.use(
 
 app.use("/api", api);
 
+// @ts-ignore
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+app.use((err, req, res, next) => {
+  console.error("symbat", err);
+  res.status(500).json({
+    message: err.message,
+    errorCode: err?.errorCode,
+  });
+});
 export const sessionCache = new NodeCache({
   stdTTL: 60 * 10,
   useClones: false,

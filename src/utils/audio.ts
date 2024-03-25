@@ -1,7 +1,7 @@
 import type { FileLike } from "openai/uploads";
 import { openai } from "../app";
 import FormData from "form-data";
-import axios from "axios";
+import axios, { isAxiosError } from "axios";
 
 export const createInstructions = (instructions: string) => {
   return `Instruction: "${instructions}"
@@ -82,13 +82,14 @@ export const transcribeAxiosBlob = async (
         },
       }
     );
+
     return response.data;
   } catch (error) {
     // console.log("error:", error);+
     // @ts-expect-error ts-migrate(2532) FIXME: Object is possibly 'undefined'.
-    console.log("error.response.data:", error.response.data);
-
-    throw error;
+    console.log("error.response.data:", error?.response?.data);
+    const isAxiosErr = isAxiosError(error);
+    throw isAxiosErr ? error?.response?.data?.error : error;
   }
 };
 
